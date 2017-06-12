@@ -1,0 +1,31 @@
+dependencies:
+  '@types/node': 7.0.29
+  js-actor: github.com/huangbinjie/js-actor/72e17fbcf4b8402ebecb941226e5261ac3c39a74
+packages:
+  /@types/node/7.0.29:
+    resolution:
+      integrity: sha1-zPzsW3E1x8r2xP+4x/MxAjQNmd8=
+  /@types/uuid/3.0.0:
+    dependencies:
+      '@types/node': 7.0.29
+    resolution:
+      integrity: sha1-vpOxS8+X9ZwHmp5YdUlgte/ZRsM=
+  /events/1.1.1:
+    resolution:
+      integrity: sha1-nr23Y1rQmccNzEwqH1AEKI6L2SQ=
+  /uuid/3.0.1:
+    resolution:
+      integrity: sha1-ZUS7ot/ajBzxfmKaOjBeK7H+5sE=
+  github.com/huangbinjie/js-actor/72e17fbcf4b8402ebecb941226e5261ac3c39a74:
+    dependencies:
+      '@types/node': 7.0.29
+      '@types/uuid': 3.0.0
+      events: 1.1.1
+      uuid: 3.0.1
+    resolution:
+      tarball: 'https://codeload.github.com/huangbinjie/js-actor/tar.gz/72e17fbcf4b8402ebecb941226e5261ac3c39a74'
+registry: 'https://registry.npmjs.org/'
+specifiers:
+  '@types/node': ^7.0.29
+  js-actor: 'git+https://github.com/huangbinjie/js-actor.git'
+version: 3
