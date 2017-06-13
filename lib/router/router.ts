@@ -5,34 +5,71 @@ import { Receive } from "js-actor"
 import { Context } from "../../src/context"
 
 export class Router {
-	private receiveBuilder: ReceiveBuilder
+	private _routes: Route[] = []
 
 	public use() {
 
 	}
 
 	public get(url: string, ...fns: Callback[]) {
-		this.receiveBuilder.match(Context, context => {
-			if (context.req.method === "GET" && context.req.url === url) {
-				for (let fn of fns) {
-					fn(context.req, context.res)
-				}
-			}
-		})
+		this._routes.push({ method: "GET", url, callbacks: fns })
 	}
 
 	public routes() {
 		const _this = this
 		return class RouterActor extends AbstractActor {
 			public createReceive() {
-				return _this.receiveBuilder.build()
+				return this.receiveBuilder()
+					.match(Context, context => {
+						for (let route of _this._routes) {
+							if (route.method === context.req.method && route.url === context.req.url) {
+								const genCallback = compose(route.callbacks)
+								runcb(context, genCallback, genCallback.next().value)
+							}
+						}
+					})
+					.build()
 			}
 		}
 	}
+}
 
-	constructor() {
-		this.receiveBuilder = new ReceiveBuilder()
+class RouterActor extends AbstractActor {
+	constructor(private routes: Route[]) { super() }
+
+	public createReceive() {
+		return this.receiveBuilder()
+			.match(Context, context => {
+				for (let route of this.routes) {
+					if (route.method === context.req.method && route.url === context.req.url) {
+						const genCallback = compose(route.callbacks)
+						runcb(context, genCallback, genCallback.next().value)
+					}
+				}
+			})
+			.build()
+	}
+
+}
+
+function runcb(context: Context, genCallback: Iterator<Callback>, cb: Callback) {
+	cb(context.req, context.res, () => {
+		const nextcb = genCallback.next().value
+		if (nextcb) runcb(context, genCallback, nextcb)
+		else context.next()
+	})
+}
+
+function* compose(fns: Callback[]) {
+	for (let fn of fns) {
+		yield fn
 	}
 }
 
-export type Callback = (req: Context["req"], res: Context["res"]) => void
+export type Route = {
+	method: string
+	url: string,
+	callbacks: Callback[]
+}
+
+export type Callback = (req: Context["req"], res: Context["res"], next: () => void) => void

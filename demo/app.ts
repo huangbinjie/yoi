@@ -1,3 +1,5 @@
+import { AbstractActor } from "js-actor"
+import { Context } from "../src/context"
 import { Server } from "../src/server"
 import routes from "./router"
 
@@ -8,3 +10,4 @@ app.use(routes)
 app.listen(3000)
 
 console.log("server has listened on 3000")
+
