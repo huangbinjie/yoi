@@ -1,7 +1,6 @@
 # yoi
 
 yoi 是一个基于 actor 架构的 node server 框架，兼容 express 独立插件。
-仅兼容 express 的独立插件。
 
 ## 工作原理
 
