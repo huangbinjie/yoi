@@ -9,4 +9,9 @@ router.get("/", (req, res, next) => {
 	res.send("hello")
 })
 
+router.post("/", (req, res) => {
+	console.log(req.body)
+	res.json(req.body)
+})
+
 export default router.routes()

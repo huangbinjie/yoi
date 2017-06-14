@@ -1,0 +1,11 @@
+{
+  "name": "demo",
+  "dependencies": {
+    "@types/body-parser": "^1.16.3",
+    "body-parser": "^1.17.2",
+    "morgan": "^1.8.2"
+  },
+  "devDependencies": {
+    "@types/morgan": "^1.7.32"
+  }
+}
