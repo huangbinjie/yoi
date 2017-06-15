@@ -15,10 +15,9 @@ export class Server {
 		const server = http.createServer((req, res) => {
 			const request = new Request(req)
 			const response = new Response(res)
-			const nextActor = this.system.actorOf(new Startpoint)
-			const worker = new Worker(nextActor, this.middlewares)
+			const worker = new Worker(this.system, this.middlewares)
 			const context = new Context(request, response, worker)
-			nextActor.tell(context)
+			worker.next(context)
 		})
 
 		server.listen(port)
@@ -26,14 +25,6 @@ export class Server {
 
 	public use(middleware: Middleware) {
 		this.middlewares.push(middleware)
-	}
-}
-
-class Startpoint extends AbstractActor {
-	public createReceive() {
-		return this.receiveBuilder()
-			.match(Context, context => context.worker.next(context))
-			.build()
 	}
 }
 
