@@ -17,16 +17,12 @@ export class Worker {
 			this.endpoint = this.endpoint.getContext().actorOf(new midActor)
 		}
 	}
+	public start(context: Context) {
+		this.startpoint.tell(context)
+	}
 
-	/**
-	 * if processing actor is the endpoint, kill this work line.
-	 * otherwise process child actor.
-	 */
-	public async next(message: object) {
-		if (this.nextActor.name === this.endpoint.name) {
-			this.stop()
-			return
-		}
+	public next(message: object) {
+		if (this.nextActor.name === this.endpoint.name) return
 		this.nextActor = this.nextActor.getContext().children.values().next().value
 		this.nextActor.tell(message)
 	}
@@ -39,7 +35,9 @@ export class Worker {
 class Startpoint extends AbstractActor {
 	public createReceive() {
 		return this.receiveBuilder()
-			.match(Context, context => context.worker.next(context))
+			.match(Context, context => {
+				context.worker.next(context)
+			})
 			.build()
 	}
 }

@@ -34,24 +34,6 @@ export class Router {
 	}
 }
 
-// class RouterActor extends AbstractActor {
-// 	constructor(private routes: Route[]) { super() }
-
-// 	public createReceive() {
-// 		return this.receiveBuilder()
-// 			.match(Context, context => {
-// 				for (let route of this.routes) {
-// 					if (route.method === context.req.method && route.url === context.req.url) {
-// 						const genCallback = compose(route.callbacks)
-// 						runcb(context, genCallback, genCallback.next().value)
-// 					}
-// 				}
-// 			})
-// 			.build()
-// 	}
-
-// }
-
 function runcb(req: Request, res: Response, next: () => void, genCallback: Iterator<Callback>, cb: Callback) {
 	cb(req, res, () => {
 		const nextcb = genCallback.next().value

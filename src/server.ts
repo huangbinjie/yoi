@@ -2,6 +2,7 @@ import * as http from "http"
 import { ActorSystem } from "js-actor"
 import { AbstractActor } from "js-actor"
 import { ActorRef } from "js-actor"
+import * as onFinished from "on-finished"
 
 import { Context } from "./context"
 import { Request } from "./request"
@@ -17,7 +18,8 @@ export class Server {
 			const response = new Response(res)
 			const worker = new Worker(this.system, this.middlewares)
 			const context = new Context(request, response, worker)
-			worker.next(context)
+			worker.start(context)
+			onFinished(context.res, () => worker.stop())
 		})
 
 		server.listen(port)
