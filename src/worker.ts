@@ -2,29 +2,24 @@ import { ActorSystem } from "js-actor"
 import { ActorRef } from "js-actor"
 import { AbstractActor } from "js-actor"
 
-import { Middleware } from "./server"
-import { Context } from "./context"
+import { Middleware, Operator, ErrorHandler } from "./server"
+import { Success } from "./success"
+import { Failure } from "./failure"
 
 export class Worker {
 	private nextActor: ActorRef
 	private startpoint: ActorRef
 	private endpoint: ActorRef
-	constructor(system: ActorSystem, middlewares: Middleware[]) {
-		this.startpoint = this.nextActor = system.actorOf(new Startpoint)
+	constructor(system: ActorSystem, operators: Operator[]) {
+		const startpoint = createUseActor((req, res, next) => next())
+		this.startpoint = this.nextActor = system.actorOf(new startpoint)
 		this.endpoint = this.nextActor
-		for (let mid of middlewares) {
-			const midActor = createActor(mid)
-			this.endpoint = this.endpoint.getContext().actorOf(new midActor)
+		for (let ope of operators) {
+			this.endpoint = this.endpoint.getContext().actorOf(new ope)
 		}
 	}
-	public start(context: Context) {
+	public start(context: Success) {
 		this.startpoint.tell(context)
-	}
-
-	public next(message: object) {
-		if (this.nextActor.name === this.endpoint.name) return
-		this.nextActor = this.nextActor.getContext().children.values().next().value
-		this.nextActor.tell(message)
 	}
 
 	public stop() {
@@ -32,22 +27,42 @@ export class Worker {
 	}
 }
 
-class Startpoint extends AbstractActor {
-	public createReceive() {
-		return this.receiveBuilder()
-			.match(Context, context => {
-				context.worker.next(context)
-			})
-			.build()
+export function createUseActor(mid: Middleware) {
+	return class UseActor extends AbstractActor {
+		public createReceive() {
+			return this.receiveBuilder()
+				.match(Success, success =>
+					mid(success.req, success.res, (err?: Error) => {
+						const message = err ? new Failure(err, success) : success
+						this.next(message)
+					}))
+				.match(Failure, failure => this.next(failure))
+				.build()
+		}
+
+		public next(message: object) {
+			if (this.context.children.size === 0) return
+			this.context.children.values().next().value.tell(message)
+		}
 	}
 }
 
-function createActor(mid: Middleware) {
-	return class MiddlewareActor extends AbstractActor {
+export function createCatchActor(errorHandler: ErrorHandler) {
+	return class CatchActor extends AbstractActor {
 		public createReceive() {
 			return this.receiveBuilder()
-				.match(Context, context => mid(context.req, context.res, () => context.worker.next(context)))
+				.match(Success, success => this.next(success))
+				.match(Failure, ({ error, success }) =>
+					errorHandler(error, success.req, success.res, (err?: Error) => {
+						const message = err ? new Failure(err, success) : success
+						this.next(message)
+					}))
 				.build()
+		}
+
+		public next(message: object) {
+			if (this.context.children.size === 0) return
+			this.context.children.values().next().value.tell(message)
 		}
 	}
 }
