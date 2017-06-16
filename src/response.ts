@@ -6,6 +6,7 @@ import * as cookie from "cookie"
 export interface IResponse extends ServerResponse, ExpressResponse {
 	append(field: string, val: string | string[]): this
 	set(field: string | { [key: string]: string }, val?: string | string[]): this
+	redirect(url: string | number, status?: number | string): void
 }
 
 export function createResponse(response: IResponse): IResponse {
@@ -67,8 +68,8 @@ export function createResponse(response: IResponse): IResponse {
 		return this
 	}
 
-	response.location = function () {
-		return this
+	response.location = function (url: string) {
+		return this.set("Location", url)
 	}
 
 	response.json = function (body: Object) {
@@ -82,8 +83,11 @@ export function createResponse(response: IResponse): IResponse {
 		return this
 	}
 
-	response.redirect = function () {
-		return this
+	response.redirect = function (url: string) {
+		// this.statusCode = 302
+		// this.location(url)
+		console.log(url)
+		this.end("")
 	}
 
 	response.render = function () {
@@ -91,6 +95,7 @@ export function createResponse(response: IResponse): IResponse {
 	}
 
 	response.send = function (body: Object) {
+		if (typeof body === "object") body = JSON.stringify(body)
 		this.end(body, "utf8")
 		return this
 	}
