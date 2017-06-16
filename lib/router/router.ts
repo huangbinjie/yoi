@@ -28,8 +28,10 @@ export class Router {
 				if (route.method === req.method && route.url === req.url) {
 					const genCallback = compose(route.callbacks)
 					runcb(req, res, next, genCallback, genCallback.next().value)
+					return
 				}
 			}
+			next()
 		}
 	}
 }

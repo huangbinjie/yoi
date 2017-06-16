@@ -29,6 +29,10 @@ app.use((req, res, next) => {
 // use router, only support individual express middleware.so express.router() will not work
 app.use(routes)
 
+app.use((req, res) => {
+	res.status(404).send("page not found")
+})
+
 app.listen(3000)
 
 console.log("server has listened on 3000")
