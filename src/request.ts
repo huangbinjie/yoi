@@ -48,16 +48,21 @@ export function createRequest(request: IRequest): IRequest {
 	}
 
 	defineGetter(request, "host", function () {
-		return this.hostname
-	})
-	// TODO
-	defineGetter(request, "hostname", function () {
-		return ""
+		return this.get("Host")
 	})
 
-	// TODO
+	defineGetter(request, "hostname", function () {
+		const host = this.get("X-Forwarded-Host") || this.get("Host")
+
+		// IPv6 literal support
+		const offset = host[0] === "[" ? host.indexOf("]") + 1 : 0
+		const index = host.indexOf(":", offset)
+
+		return index !== -1 ? host.substring(0, index) : host
+	})
+
 	defineGetter(request, "ip", function () {
-		return ""
+		return this.socket.remoteAddress
 	})
 
 	// TODO
@@ -78,11 +83,6 @@ export function createRequest(request: IRequest): IRequest {
 	defineGetter(request, "originalUrl", function () {
 		return this.url
 	})
-
-	// not stable
-	request.param = function (name: string, defaultValue?: any) {
-		return ""
-	}
 
 	defineGetter(request, "protocol", function () {
 		return (this.connection as any).encrypted ? "https" : "http"
