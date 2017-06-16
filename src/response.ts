@@ -1,101 +1,111 @@
 import { ServerResponse } from "http"
-import { Response as ExpressResponse } from "express"
+import { CookieOptions, Response as ExpressResponse } from "express"
+import * as cookie from "cookie"
 
-export class Response implements ServerResponse, ExpressResponse {
-	// writeable
-	public writable = this._response.writable
-	public _write = this._response._write
-	public pipe = this._response.pipe
-	// ServerResponse
-	public write = this._response.write
-	public writeContinue = this._response.writeContinue
-	public writeHead = this._response.writeHead
-	public statusCode = this._response.statusCode
-	public statusMessage = this._response.statusMessage
-	public headersSent = this._response.headersSent
-	public setHeader = this._response.setHeader
-	public setTimeout = this._response.setTimeout
-	public sendDate = this._response.sendDate
-	public getHeader = this._response.getHeader
-	public removeHeader = this._response.removeHeader
-	public addTrailers = this._response.addTrailers
-	public finished = this._response.finished
-	public end = this._response.end
-	// enchanced
-	public locals: any
-	public charset: string
-	public app: any
+/** IResponse use to overlap wrong member of definition */
+export interface IResponse extends ServerResponse, ExpressResponse {
+	append(field: string, val: string | string[]): this
+	set(field: string | { [key: string]: string }, val?: string | string[]): this
+}
 
-	constructor(private _response: ServerResponse) {
+export function createResponse(response: IResponse): IResponse {
 
+	response.append = function (field: string, val: string | string[]) {
+		const prev = this.get(field)
+
+		if (prev) {
+			val = Array.isArray(prev) ? prev.concat(val) : [prev].concat(val)
+		}
+
+		return this.set(field, val)
 	}
 
-	// enchanced
-	public attachment() {
+	response.attachment = function () {
 		return this
 	}
-	public clearCookie(name: string, options?: any) {
+
+	response.clearCookie = function (name: string, options?: any) {
 		return this
 	}
-	public contentType(type: string) {
+
+	response.contentType = function (type: string) {
 		return this.type(type)
 	}
-	public cookie() {
-		return this
-	}
-	// TODO
-	public download() {
-		return this
-	}
-	// TODO
-	public format(obj: any) {
+
+	response.cookie = function (name: string, value: string | object, options = { path: "/" } as CookieOptions) {
+		value = typeof value === "object" ? "j:" + JSON.stringify(value) : value
+
+		if (options.maxAge) {
+			options.expires = new Date(Date.now() + options.maxAge)
+			options.maxAge /= 1000
+		}
+
+		this.append("Set-Cookie", cookie.serialize(name, String(value), options as cookie.CookieSerializeOptions))
 		return this
 	}
 
-	public get(header: string) {
+	// TODO
+	response.download = function () {
+		return this
+	}
+
+	// TODO
+	response.format = function (obj: any) {
+		return this
+	}
+
+	response.get = function (header: string) {
 		return this.getHeader(header)
 	}
-	public header(key: string, val?: any) {
+
+	response.header = function (key: string, val?: any) {
 		return this.set(key, val)
 	}
+
 	// TODO
-	public links() {
-		return this
-	}
-	public location() {
+	response.links = function () {
 		return this
 	}
 
-	public json(body: Object) {
+	response.location = function () {
+		return this
+	}
+
+	response.json = function (body: Object) {
 		this.set("Content-Type", "application/json")
 		this.send(JSON.stringify(body))
 		return this
 	}
+
 	// TODO
-	public jsonp() {
-		return this
-	}
-	public redirect() {
-		return this
-	}
-	public render() {
+	response.jsonp = function () {
 		return this
 	}
 
-	public send(body: Object) {
-		this._response.end(body, "utf8")
-		return this
-	}
-	// TODO
-	public sendFile() {
-		return this
-	}
-	// TODO
-	public sendfile() {
+	response.redirect = function () {
 		return this
 	}
 
-	public sendStatus(code: number) {
+	response.render = function () {
+		return this
+	}
+
+	response.send = function (body: Object) {
+		this.end(body, "utf8")
+		return this
+	}
+
+	// TODO
+	response.sendFile = function () {
+		return this
+	}
+
+	// TODO
+	response.sendfile = function () {
+		return this
+	}
+
+	response.sendStatus = function (code: number) {
 		switch (code) {
 			case 200: this.status(200).send("OK")
 			case 403: this.status(403).send("Forbidden")
@@ -106,89 +116,32 @@ export class Response implements ServerResponse, ExpressResponse {
 		return this
 	}
 
-	public set(key: string, val?: any) {
-		this.setHeader(key, val)
+	response.set = function (field: string | { [key: string]: string }, val?: string | string[]) {
+		if (2 === arguments.length && "string" === typeof field) {
+			if (Array.isArray(val)) val = val.map(String)
+			else val = String(val)
+			this.setHeader(field, val)
+		}
+		if ("object" === typeof field) {
+			for (let key of Object.keys(field)) {
+				this.set(key, field[key])
+			}
+		}
 		return this
 	}
 
-	public status(code: number) {
+	response.status = function (code: number) {
 		this.statusCode = code
 		return this
 	}
 
-	// server response
-	public setDefaultEncoding(encoding: string) {
-		this._response.setDefaultEncoding(encoding)
-		return this
-	}
-
-	public type(type: string) {
+	response.type = function (type: string) {
 		return this.set("Content-Type", type)
 	}
 
-	public vary() {
+	response.vary = function () {
 		return this
 	}
 
-	// eventemitter
-	public setMaxListeners(n: number) {
-		this._response.setMaxListeners(n)
-		return this
-	}
-
-	public getMaxListeners() {
-		return this._response.getMaxListeners()
-	}
-
-	public listeners(event: string | symbol) {
-		return this._response.listeners(event)
-	}
-
-	public eventNames() {
-		return this._response.eventNames()
-	}
-
-	public listenerCount(type: string | symbol) {
-		return this._response.listenerCount(type)
-	}
-
-	public addListener(event: string, listener: Function) {
-		this._response.addListener(event, listener)
-		return this
-	}
-
-	public emit(event: string, ...args: any[]) {
-		return this._response.emit(event, ...args)
-	}
-
-	public on(event: string, listener: Function) {
-		this._response.on(event, listener)
-		return this
-	}
-
-	public once(event: string, listener: Function) {
-		this._response.once(event, listener)
-		return this
-	}
-
-	public prependListener(event: string, listener: Function) {
-		this._response.prependListener(event, listener)
-		return this
-	}
-
-	public prependOnceListener(event: string, listener: Function) {
-		this._response.prependOnceListener(event, listener)
-		return this
-	}
-
-	public removeListener(event: string, listener: Function) {
-		this._response.removeListener(event, listener)
-		return this
-	}
-
-	public removeAllListeners(event?: string | symbol) {
-		this._response.removeAllListeners(event)
-		return this
-	}
-
+	return response
 }

@@ -5,8 +5,8 @@ import { ActorRef } from "js-actor"
 import * as onFinished from "on-finished"
 
 import { Context } from "./context"
-import { Request } from "./request"
-import { Response } from "./response"
+import { createRequest, IRequest } from "./request"
+import { createResponse, IResponse } from "./response"
 import { Worker } from "./worker"
 
 export class Server {
@@ -14,8 +14,8 @@ export class Server {
 	private middlewares: Middleware[] = []
 	public listen(port: number) {
 		const server = http.createServer((req, res) => {
-			const request = new Request(req)
-			const response = new Response(res)
+			const request = createRequest(req as IRequest)
+			const response = createResponse(res as IResponse)
 			const worker = new Worker(this.system, this.middlewares)
 			const context = new Context(request, response, worker)
 			worker.start(context)
@@ -30,4 +30,4 @@ export class Server {
 	}
 }
 
-export type Middleware = (req: Request, res: Response, next: () => void) => void
+export type Middleware = (req: IRequest, res: IResponse, next: () => void) => void
