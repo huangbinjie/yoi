@@ -21,6 +21,14 @@ export class Router {
 		this._routes.push({ method: "POST", url, callbacks: fns })
 	}
 
+	public put(url: string, ...fns: Middleware[]) {
+		this._routes.push({ method: "PUT", url, callbacks: fns })
+	}
+
+	public delete(url: string, ...fns: Middleware[]) {
+		this._routes.push({ method: "DELETE", url, callbacks: fns })
+	}
+
 	public routes() {
 		return (req: IRequest, res: IResponse, next: (error?: Error) => void) => {
 			for (let route of this._routes) {
