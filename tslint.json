@@ -38,6 +38,9 @@
 		"new-parens": false,
 		"variable-name": [
 			// "allow-leading-underscore"
+		],
+		"only-arrow-functions": [
+			false
 		]
 	}
 }

@@ -3,15 +3,14 @@ import { Router } from "../lib/router/router"
 const router = new Router
 
 router.get("/", (req, res, next) => {
-	console.log("this is a interceptor")
+	req.session.name = "corol"
 	next()
 }, (req, res) => {
 	res.send("hello")
 })
 
-router.post("/", (req, res) => {
-	console.log(req.body)
-	res.json(req.body)
+router.get("/session", (req, res) => {
+	res.send(req.session.name)
 })
 
 export default router.routes()
