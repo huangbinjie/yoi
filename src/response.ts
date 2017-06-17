@@ -25,8 +25,10 @@ export function createResponse(response: IResponse): IResponse {
 		return this
 	}
 
-	response.clearCookie = function (name: string, options?: any) {
-		return this
+	response.clearCookie = function (name: string, options: CookieOptions) {
+		const opts = { expires: new Date(1), path: "/", ...options }
+
+		return this.cookie(name, "", opts)
 	}
 
 	response.contentType = function (type: string) {
@@ -41,8 +43,7 @@ export function createResponse(response: IResponse): IResponse {
 			options.maxAge /= 1000
 		}
 
-		this.append("Set-Cookie", cookie.serialize(name, String(value), options as cookie.CookieSerializeOptions))
-		return this
+		return this.append("Set-Cookie", cookie.serialize(name, String(value), options as cookie.CookieSerializeOptions))
 	}
 
 	// TODO
@@ -84,10 +85,9 @@ export function createResponse(response: IResponse): IResponse {
 	}
 
 	response.redirect = function (url: string) {
-		// this.statusCode = 302
-		// this.location(url)
-		console.log(url)
-		this.end("")
+		this.statusCode = 302
+		this.location(url)
+		this.end()
 	}
 
 	response.render = function () {
