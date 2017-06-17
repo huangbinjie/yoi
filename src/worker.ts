@@ -7,15 +7,13 @@ import { Success } from "./success"
 import { Failure } from "./failure"
 
 export class Worker {
-	private nextActor: ActorRef
 	private startpoint: ActorRef
-	private endpoint: ActorRef
 	constructor(system: ActorSystem, operators: Operator[]) {
 		const startpoint = createUseActor((req, res, next) => next())
-		this.startpoint = this.nextActor = system.actorOf(new startpoint)
-		this.endpoint = this.nextActor
+		this.startpoint = system.actorOf(new startpoint)
+		let endpoint = this.startpoint
 		for (let ope of operators) {
-			this.endpoint = this.endpoint.getContext().actorOf(new ope)
+			endpoint = endpoint.getContext().actorOf(new ope)
 		}
 	}
 	public start(context: Success) {
