@@ -1,0 +1,63 @@
+┌──────────┬────┬──────┬──────┬────────┬─────────┬────────┬─────────────┬──────────┐
+│ App name │ id │ mode │ pid  │ status │ restart │ uptime │ memory      │ watching │
+├──────────┼────┼──────┼──────┼────────┼─────────┼────────┼─────────────┼──────────┤
+│ app      │ 0  │ fork │ 6874 │ online │ 0       │ 4s     │ 38.840 MB   │ disabled │
+└──────────┴────┴──────┴──────┴────────┴─────────┴────────┴─────────────┴──────────┘
+
+Benchmarking localhost (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        
+Server Hostname:        localhost
+Server Port:            3000
+
+Document Path:          /
+Document Length:        5 bytes
+
+Concurrency Level:      100
+Time taken for tests:   10.672 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      2066294 bytes
+HTML transferred:       50000 bytes
+Requests per second:    937.03 [#/sec] (mean)
+Time per request:       106.721 [ms] (mean)
+Time per request:       1.067 [ms] (mean, across all concurrent requests)
+Transfer rate:          189.08 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    1   0.4      0       4
+Processing:    59  106  18.7    104     208
+Waiting:       20   80  19.6     79     197
+Total:         59  106  18.7    105     209
+ERROR: The median and mean for the initial connection time are more than twice the standard
+       deviation apart. These results are NOT reliable.
+
+Percentage of the requests served within a certain time (ms)
+  50%    105
+  66%    108
+  75%    112
+  80%    114
+  90%    127
+  95%    143
+  98%    159
+  99%    180
+ 100%    209 (longest request)
+
+┌──────────┬────┬──────┬──────┬────────┬─────────┬────────┬─────────────┬──────────┐
+│ App name │ id │ mode │ pid  │ status │ restart │ uptime │ memory      │ watching │
+├──────────┼────┼──────┼──────┼────────┼─────────┼────────┼─────────────┼──────────┤
+│ app      │ 0  │ fork │ 6874 │ online │ 0       │ 2m     │ 49.422 MB   │ disabled │
+└──────────┴────┴──────┴──────┴────────┴─────────┴────────┴─────────────┴──────────┘

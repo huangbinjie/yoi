@@ -1,0 +1,62 @@
+┌──────────┬────┬──────┬──────┬────────┬─────────┬────────┬─────────────┬──────────┐
+│ App name │ id │ mode │ pid  │ status │ restart │ uptime │ memory      │ watching │
+├──────────┼────┼──────┼──────┼────────┼─────────┼────────┼─────────────┼──────────┤
+│ app      │ 0  │ fork │ 6431 │ online │ 0       │ 6s     │ 40.867 MB   │ disabled │
+└──────────┴────┴──────┴──────┴────────┴─────────┴────────┴─────────────┴──────────┘
+
+Benchmarking localhost (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        
+Server Hostname:        localhost
+Server Port:            3000
+
+Document Path:          /
+Document Length:        42 bytes
+
+Concurrency Level:      100
+Time taken for tests:   5.821 seconds
+Complete requests:      10000
+Failed requests:        0
+Non-2xx responses:      10000
+Total transferred:      3766320 bytes
+HTML transferred:       420000 bytes
+Requests per second:    1717.96 [#/sec] (mean)
+Time per request:       58.209 [ms] (mean)
+Time per request:       0.582 [ms] (mean, across all concurrent requests)
+Transfer rate:          631.87 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    1   0.5      1       5
+Processing:    26   57  18.9     54     154
+Waiting:       18   44  14.6     40     149
+Total:         27   58  19.0     54     156
+
+Percentage of the requests served within a certain time (ms)
+  50%     54
+  66%     62
+  75%     67
+  80%     70
+  90%     83
+  95%     94
+  98%    114
+  99%    120
+ 100%    156 (longest request)
+
+┌──────────┬────┬──────┬──────┬────────┬─────────┬────────┬─────────────┬──────────┐
+│ App name │ id │ mode │ pid  │ status │ restart │ uptime │ memory      │ watching │
+├──────────┼────┼──────┼──────┼────────┼─────────┼────────┼─────────────┼──────────┤
+│ app      │ 0  │ fork │ 6431 │ online │ 0       │ 3m     │ 45.715 MB   │ disabled │
+└──────────┴────┴──────┴──────┴────────┴─────────┴────────┴─────────────┴──────────┘
