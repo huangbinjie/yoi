@@ -1,7 +1,6 @@
 import * as http from "http"
 import { ActorSystem } from "js-actor"
 import { AbstractActor } from "js-actor"
-import { ActorRef } from "js-actor"
 import * as onFinished from "on-finished"
 
 import { Success } from "./success"
@@ -18,7 +17,7 @@ export class Server {
 			const request = createRequest(req as IRequest)
 			const response = createResponse(res as IResponse)
 			const context = new Success(request, response)
-			const worker = new Worker(this.system, this.operators)
+			const worker = new Worker(this.system, this.operators.slice())
 			worker.start(context)
 			onFinished(context.res, () => worker.stop())
 		})
@@ -27,12 +26,12 @@ export class Server {
 	}
 
 	public use(middleware: Middleware) {
-		this.operators.push(createUseActor(middleware))
+		this.operators.unshift(createUseActor(middleware))
 		return this
 	}
 
 	public catch(handler: ErrorHandler) {
-		this.operators.push(createCatchActor(handler))
+		this.operators.unshift(createCatchActor(handler))
 		return this
 	}
 }

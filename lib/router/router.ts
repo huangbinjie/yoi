@@ -1,7 +1,3 @@
-import { AbstractActor } from "js-actor"
-import { ReceiveBuilder } from "js-actor"
-import { Receive } from "js-actor"
-
 import { Middleware } from "../../src/server"
 import { IRequest } from "../../src/request"
 import { IResponse } from "../../src/response"

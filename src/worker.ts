@@ -8,16 +8,17 @@ import { Failure } from "./failure"
 
 export class Worker {
 	private startpoint: ActorRef
+	private handler: ActorRef
 	constructor(system: ActorSystem, operators: Operator[]) {
-		const startpoint = createUseActor((req, res, next) => next())
-		this.startpoint = system.actorOf(new startpoint)
-		let endpoint = this.startpoint
+		const handler = createUseActor((req, res, next) => next())
+		let endpoint = this.startpoint = system.actorOf(new (operators.shift()))
 		for (let ope of operators) {
 			endpoint = endpoint.getContext().actorOf(new ope)
 		}
+		this.handler = endpoint.getContext().actorOf(new handler)
 	}
 	public start(context: Success) {
-		this.startpoint.tell(context)
+		this.handler.tell(context)
 	}
 
 	public stop() {
@@ -39,8 +40,7 @@ export function createUseActor(mid: Middleware) {
 		}
 
 		public next(message: object) {
-			if (this.context.children.size === 0) return
-			this.context.children.values().next().value.tell(message)
+			this.context.parent.tell(message)
 		}
 	}
 }
@@ -59,8 +59,7 @@ export function createCatchActor(errorHandler: ErrorHandler) {
 		}
 
 		public next(message: object) {
-			if (this.context.children.size === 0) return
-			this.context.children.values().next().value.tell(message)
+			this.context.parent.tell(message)
 		}
 	}
 }

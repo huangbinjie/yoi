@@ -1,7 +1,7 @@
 import { IncomingMessage } from "http"
 import * as accepts from "accepts"
 import * as rangeParser from "range-parser"
-import * as url from "url"
+const typeis = require("typeis")
 import { Request as ExpressRequest, MediaType } from "express"
 
 export interface IRequest extends IncomingMessage, ExpressRequest {
@@ -39,11 +39,28 @@ export function createRequest(request: IRequest): IRequest {
 		return true
 	})
 
-	request.get = function (name: string) {
-		return this.headers[name.toLowerCase()]
+	request.get = function (name: string): any {
+		if (!name) {
+			throw new TypeError('name argument is required to req.get');
+		}
+
+		if (typeof name !== 'string') {
+			throw new TypeError('name must be a string to req.get');
+		}
+
+		var lc = name.toLowerCase();
+
+		switch (lc) {
+			case 'referer':
+			case 'referrer':
+				return this.headers.referrer
+					|| this.headers.referer;
+			default:
+				return this.headers[lc];
+		}
 	}
 
-	request.header = function (name: string) {
+	request.header = function (name: string): any {
 		return this.get(name)
 	}
 
@@ -52,13 +69,24 @@ export function createRequest(request: IRequest): IRequest {
 	})
 
 	defineGetter(request, "hostname", function () {
-		const host = this.get("X-Forwarded-Host") || this.get("Host")
+		var trust = this.app.get('trust proxy fn');
+		var host = this.get('X-Forwarded-Host');
+
+		if (!host || !trust(this.connection.remoteAddress, 0)) {
+			host = this.get('Host');
+		}
+
+		if (!host) return;
 
 		// IPv6 literal support
-		const offset = host[0] === "[" ? host.indexOf("]") + 1 : 0
-		const index = host.indexOf(":", offset)
+		var offset = host[0] === '['
+			? host.indexOf(']') + 1
+			: 0;
+		var index = host.indexOf(':', offset);
 
-		return index !== -1 ? host.substring(0, index) : host
+		return index !== -1
+			? host.substring(0, index)
+			: host;
 	})
 
 	defineGetter(request, "ip", function () {
@@ -75,9 +103,8 @@ export function createRequest(request: IRequest): IRequest {
 		return []
 	})
 
-	// TODO
-	request.is = function (type: string) {
-		return true
+	request.is = function (types: string) {
+		return typeis(this, types);
 	}
 
 	defineGetter(request, "originalUrl", function () {
